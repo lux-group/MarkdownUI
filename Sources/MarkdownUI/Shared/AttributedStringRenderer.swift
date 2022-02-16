@@ -95,9 +95,6 @@ private extension AttributedStringRenderer {
         case let .list(value):
             saveState()
             defer { restoreState() }
-
-            state.paragraph.indentLevel += 1
-
             return attributedString(for: value)
 
         case let .code(value, _):
@@ -292,7 +289,7 @@ private extension List {
     func delimiter(at index: Int) -> String {
         switch style {
         case .bullet:
-            return "\u{2022}"
+            return "·"
         case let .ordered(start):
             return "\(start + index)."
         }
