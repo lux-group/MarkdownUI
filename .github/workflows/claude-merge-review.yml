@@ -1,0 +1,36 @@
+# Claude Merge Review Workflow
+#
+# Triggers:
+# - Automatic (enable_merge_review_always: false, default):
+#   - Dismisses previous approvals when new commits are pushed
+# - Automatic (enable_merge_review_always: true):
+#   - Runs merge review when PR is marked ready for review or new commits are pushed (non-draft PRs only)
+#   - Assigns risk scores (1-5) based on change complexity
+#   - Auto-approves low-risk PRs (configurable threshold)
+# - Manual: When someone comments `@claude merge review` in the PR
+#   - Assigns risk scores (1-5) based on change complexity
+#   - Auto-approves low-risk PRs (configurable threshold)
+
+name: Claude Auto Approval Merge Review
+
+on:
+  pull_request:
+    types: [synchronize, ready_for_review]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: claude-merge-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  claude-merge-review:
+    uses: lux-group/github-actions/.github/workflows/claude-merge-review.yml@main
+    secrets:
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME_GITHUB_ROLE_DEV }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CONTEXT7_API_KEY: ${{ secrets.CONTEXT7_API_KEY }}
+      REVIEWER_GITHUB_TOKEN: ${{ secrets.REVIEWER_GITHUB_TOKEN }}
+    with:
+      auto_approve_score: "1" # Auto-approve PRs with risk score 1 (very low risk)
+      skip_setup_node_deps: true
