@@ -1,0 +1,25 @@
+# Renovate luxuryescapes-reviewer Approval Workflow
+#
+# Triggers on all pull_request_review events. The reusable workflow handles
+# filtering (skips non-Renovate reviews). This avoids duplicating filter logic
+# across caller workflows.
+#
+# When renovate-approve[bot] approves a Renovate PR:
+# - Adds luxuryescapes-reviewer approval using REVIEWER_GITHUB_TOKEN
+# - GitHub's auto-merge (enabled by Renovate) handles the rest
+
+name: Renovate Approval
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+concurrency:
+  group: renovate-approval-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  renovate-approval:
+    uses: lux-group/github-actions/.github/workflows/renovate-approval.yml@main
+    secrets:
+      REVIEWER_GITHUB_TOKEN: ${{ secrets.REVIEWER_GITHUB_TOKEN }}

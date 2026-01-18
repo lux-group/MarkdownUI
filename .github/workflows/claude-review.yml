@@ -1,0 +1,27 @@
+# Claude Code Review Workflow
+#
+# Triggers:
+# - Automatic: When a PR is opened or marked as ready for review
+# - Manual: When someone comments `@claude review` in the PR
+
+name: Claude Auto Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  claude-review:
+    uses: lux-group/github-actions/.github/workflows/claude-review.yml@main
+    secrets:
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME_GITHUB_ROLE_DEV }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CONTEXT7_API_KEY: ${{ secrets.CONTEXT7_API_KEY }}
+    with:
+      skip_setup_node_deps: true
