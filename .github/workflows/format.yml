@@ -8,12 +8,12 @@ jobs:
     name: SwiftFormat
     runs-on: macos-11.0
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Install
         run: brew install swiftformat
       - name: Format
         run: make format
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Run swiftformat
           branch: 'main'
